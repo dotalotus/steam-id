@@ -1,4 +1,4 @@
-import { addMsg, Err, isErr } from "./deps.ts";
+import { Err, isErr } from "./deps.ts";
 
 export default class SteamIdentifier {
   /** @description The standard Steam id format. STEAM_0:1:XXXXXXXX */
@@ -19,21 +19,21 @@ export default class SteamIdentifier {
   static from(steamid: string) {
     const result = normalizeSteamID(steamid);
     if (isErr(result)) {
-      return addMsg(result, "Failed to normalize steamid given: " + steamid);
+      return result;
     }
     return new SteamIdentifier(result);
   }
   static fromID64(steamid: string) {
     const result = normalizeFromID32(steamid);
     if (isErr(result)) {
-      return addMsg(result, "Failed to normalize steamid given: " + steamid);
+      return result;
     }
     return new SteamIdentifier(result);
   }
   static fromID32(steamid: string) {
     const result = normalizeFromID32(steamid);
     if (isErr(result)) {
-      return addMsg(result, "Failed to normalize steamid given: " + steamid);
+      return result;
     }
     return new SteamIdentifier(result);
   }
@@ -57,7 +57,7 @@ export function normalizeSteamID(
   const is_numeric = !isNaN(Number(steamid));
   const is_id0 = ID0_REGEX.test(steamid);
   if (is_id0) {
-    return Err("ID0 is not supported");
+    return new Err("ID0 is not supported");
   }
   if (is_id3) {
     return normalizeFromID3(steamid);
@@ -70,7 +70,7 @@ export function normalizeSteamID(
       return normalizeFromID64(steamid);
     }
   }
-  return Err("Invalid Input");
+  return new Err("Invalid Input");
 }
 
 export function normalizeFromID32(steamid: string) {
